@@ -369,19 +369,14 @@ L = len(self.t), and these returned arrays are sampled at self.t
 
         if omega_ref is not None:
             t_ref = self._get_t_ref(omega_ref, q, chiA0, chiB0, init_orbphase, init_quat)
-        y_of_t, i0 = self._initialize(q, chiA0, chiB0, init_quat, init_orbphase, t_ref)
+        y_of_t, i0 = self._initialize(q, chiA0, chiB0, init_quat, init_orbphase, t_ref,
+                                      normA, normB)
 
         if i0 == 0:
             # Just gonna send it!
             k_ab4, dt_ab4, y_of_t = self._initial_RK4(q, y_of_t, normA, normB)
             y_of_t = self._integrate_forward(q, y_of_t, normA, normB, 3, k_ab4, dt_ab4)
         elif i0 > 2:
-            # TODO: There may be a small bug somewhere, or it could just be that the AB4 system
-            # is sensitive to how it's initialized, which depends on t_ref.
-            # There are phase differences of ~1.e-3 radians when varying t_ref near t_0 compared
-            # to t_ref=t_0, and the phase
-            # error has structure suggesting the first forwards integration step isn't working well.
-
             # Initialize by taking 3 steps backwards with RK4
             k_ab4 = [None, None, None]
             for i in range(3):
@@ -390,7 +385,7 @@ L = len(self.t), and these returned arrays are sampled at self.t
             dt_array = np.append(2 * self.diff_t[:6:2], self.diff_t[6:])
             dt_ab4 = dt_array[i0-3:i0][::-1]
             self._integrate_backward(q, y_of_t, normA, normB, i0-3, k_ab4, dt_ab4)
-            tmp_k = self.get_time_deriv_from_index(i0-3, q, y_of_t[i0-3])
+            tmp_k = self.get_time_deriv_from_index(i0, q, y_of_t[i0-3])
             k_ab4 = [tmp_k, k_ab4[2], k_ab4[1]]
             dt_ab4 = dt_ab4[::-1]
             self._integrate_forward(q, y_of_t, normA, normB, i0, k_ab4, dt_ab4)
@@ -415,7 +410,7 @@ L = len(self.t), and these returned arrays are sampled at self.t
 
         return quat, orbphase, chiA_copr, chiB_copr
 
-    def _initialize(self, q, chiA0, chiB0, init_quat, init_orbphase, t_ref=None):
+    def _initialize(self, q, chiA0, chiB0, init_quat, init_orbphase, t_ref, normA, normB):
         """
 Initializes an array of data with the initial conditions.
 If t_ref does not correspond to a time node, takes one small time step to
@@ -440,6 +435,7 @@ the nearest time node.
             t0 = times[i0]
             dydt0 = self.get_time_deriv(t_ref, q, y0)
             y_node = y0 + (t0 - t_ref) * dydt0
+            y_node = _utils.normalize_y(y_node, normA, normB)
             data[i0, :] = y_node
 
         return data, i0
