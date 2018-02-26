@@ -1,0 +1,30 @@
+This is a Python package for evaluating the NRSur7dq2 surrogate model
+of gravitational waves from numerical relativity simulations of binary
+black hole mergers. A paper describing the model can be found at
+https://journals.aps.org/prd/abstract/10.1103/PhysRevD.96.024058
+or
+https://arxiv.org/abs/1705.07089
+
+Note: This package does not yet support Python 3.
+
+########## Installation instructions:
+
+This package can be installed with
+    python setup.py install
+or
+    python setup.py install --user
+to install into a user directory.
+
+########## Usage:
+In python, simply
+>>> import NRSur7dq2
+
+then load the surrogate data, found at
+https://www.black-holes.org/surrogates/
+with
+>>> sur = NRSur7dq2.NRSurrogate7dq2("NRSur7dq2.h5")
+
+See the NRSur7dq2.NRSurrogate7dq2 docstring for evaluation instructions.
+A tutorial notebook can also be found at the above url.
+
+If you encounter difficulties, email jblackman@tapir.caltech.edu
