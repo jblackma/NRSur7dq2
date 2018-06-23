@@ -9,7 +9,7 @@ published in Blackman et al. 2017 PRD.
 __copyright__ = "Copyright (C) 2017 Jonathan Blackman"
 __email__     = "jblackman@tapir.caltech.edu"
 __author__    = "Jonathan Blackman"
-__version__   = "1.1.0"
+__version__   = "1.0.3"
 __license__ = """
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -834,7 +834,8 @@ See the __call__ docstring for other parameters.
 
     def __call__(self, q, chiA0, chiB0, init_phase=0.0, init_quat=None,
                  return_spins=False, t=None, theta=None, phi=None, LMax=4,
-                 t_ref=None, f_ref=None, MTot=None, distance=None):
+                 t_ref=None, f_ref=None, MTot=None, distance=None,
+                 use_lalsimulation_conventions=False):
         """
 Evaluates the surrogate model, returning either the inertial frame waveform
 modes, or the waveform evaluated at some point on the sphere.
@@ -887,6 +888,13 @@ Arguments:
     distance:       The distance to the source, given in megaparsecs.
                     If given, MTot must also be given, and the waveform amplitude
                     will be scaled appropriately.
+    use_lalsimulation_conventions: If True, interprets the spin directions and phi
+                    using lalsimulation conventions. Specifically, before evaluating
+                    the surrogate, the spins will be rotated about the z-axis by
+                    init_phase, and pi/2 will be added to phi if it is given.
+                    This agrees with lalsimulation's ChooseTDWaveform but not
+                    ChooseTDModes; set this to false to agree with ChooseTDModes.
+                    This is as of June 2018.
 
 Returns:
     h (with return_spins=False)
@@ -932,6 +940,12 @@ Examples:
 >>> plt.legend()
 >>> plt.show()
         """
+        if use_lalsimulation_conventions:
+            # rotate_spin rotates in the -z direction
+            chiA0 = rotate_spin(chiA0, -1 * init_phase)
+            chiB0 = rotate_spin(chiB0, -1 * init_phase)
+            if phi is not None:
+                phi += 0.5 * np.pi
 
         chiA_norm = np.sqrt(np.sum(chiA0**2))
         chiB_norm = np.sqrt(np.sum(chiB0**2))
