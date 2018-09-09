@@ -1,5 +1,6 @@
 #include <Python.h>
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+
 #include "numpy/arrayobject.h"
 #include "NRSur7dq2_utils.h"
 #include <math.h>
@@ -29,9 +30,24 @@
 const double Q_FIT_OFFSET = -2.9411764705882355;
 const double Q_FIT_SLOPE = 1.9607843137254901;
 
+/*
+ * Initialize the module in a way compatible with either python 2 or 3. See:
+ * https://docs.python.org/3/howto/cporting.html
+ */
+struct module_state {
+    PyObject *error;
+};
+
+#if PY_MAJOR_VERSION >= 3
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+#else
+#define GETSTATE(m) (&_state)
+static struct module_state _state;
+#endif
+
 
 /* ==== Setup the python methods table === */
-static PyMethodDef _NRSur7dq2_utilsMethods[] = {
+static PyMethodDef _NRSur7dq2_utils_methods[] = {
     {"eval_fit", eval_fit, METH_VARARGS},
     {"eval_vector_fit", eval_vector_fit, METH_VARARGS},
     {"normalize_y", normalize_y, METH_VARARGS},
@@ -43,11 +59,65 @@ static PyMethodDef _NRSur7dq2_utilsMethods[] = {
     {NULL, NULL} /* Marks the end of this structure */
 };
 
-/* Initialize c_test functions */
-void init_NRSur7dq2_utils(void) {
-    (void) Py_InitModule("_NRSur7dq2_utils", _NRSur7dq2_utilsMethods);
-    import_array(); // For numpy
+#if PY_MAJOR_VERSION >= 3
+
+static int _NRSur7dq2_utils_traverse(PyObject *m, visitproc visit, void *arg) {
+    Py_VISIT(GETSTATE(m)->error);
+    return 0;
 }
+
+static int _NRSur7dq2_utils_clear(PyObject *m) {
+    Py_CLEAR(GETSTATE(m)->error);
+    return 0;
+}
+
+
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "_NRSur7dq2_utils",
+        NULL,
+        sizeof(struct module_state),
+        _NRSur7dq2_utils_methods,
+        NULL,
+        _NRSur7dq2_utils_traverse,
+        _NRSur7dq2_utils_clear,
+        NULL
+};
+
+#define INITERROR return NULL
+
+PyMODINIT_FUNC PyInit__NRSur7dq2_utils(void)
+
+#else
+
+#define INITERROR return
+
+void init_NRSur7dq2_utils(void)
+#endif
+{
+#if PY_MAJOR_VERSION >= 3
+    PyObject *module = PyModule_Create(&moduledef);
+#else
+    PyObject *module = Py_InitModule("_NRSur7dq2_utils", _NRSur7dq2_utils_methods);
+#endif
+    import_array(); // For numpy
+
+    if (module == NULL)
+        INITERROR;
+    struct module_state *st = GETSTATE(module);
+
+    st->error = PyErr_NewException("_NRSur7dq2_utils.Error", NULL, NULL);
+    if (st->error == NULL) {
+        Py_DECREF(module);
+        INITERROR;
+    }
+
+#if PY_MAJOR_VERSION >= 3
+    return module;
+#endif
+}
+
+// Done initializing module. Actual functions start here.
 
 double ipow(double base, long exponent) {
     if (exponent == 0) return 1.0;

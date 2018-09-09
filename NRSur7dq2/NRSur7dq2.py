@@ -9,7 +9,7 @@ published in Blackman et al. 2017 PRD.
 __copyright__ = "Copyright (C) 2017 Jonathan Blackman"
 __email__     = "jonathan.blackman.0@gmail.com"
 __author__    = "Jonathan Blackman"
-__version__   = "1.0.4"
+__version__   = "1.0.5"
 __license__ = """
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ import h5py
 from scipy.interpolate import InterpolatedUnivariateSpline as spline
 import _NRSur7dq2_utils as _utils
 import warnings
-from harmonics import sYlm
+from .harmonics import sYlm
 
 SOLAR_TIME_IN_SECONDS = 4.925491025543576e-06
 SOLAR_DISTANCE_IN_MEGAPARSECS = 4.785415917274702e-20

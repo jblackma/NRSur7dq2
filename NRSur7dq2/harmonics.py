@@ -45,21 +45,21 @@ def s_lambda_lm(s, l, m, x):
     Pm = Pm * sqrt( fac(2*m + 1) * 1.0 / ( 4.0*pi * fac(m+s) * fac(m-s) ) )
    
     if (l == m):
-	return Pm
+        return Pm
    
     Pm1 = (x + s*1.0/(m+1) ) * Cslm(s, m+1, m) * Pm
    
     if (l == m+1):
-	return Pm1
+        return Pm1
     else:
-	for n in range (m+2, l+1):
+        for n in range (m+2, l+1):
       
-	    Pn = (x + s*m * 1.0 / ( n * (n-1.0) ) ) * Cslm(s, n, m) * Pm1 - Cslm(s, n, m) * 1.0 / Cslm(s, n-1, m) * Pm
-	    Pm = Pm1
-	    Pm1 = Pn
+            Pn = (x + s*m * 1.0 / ( n * (n-1.0) ) ) * Cslm(s, n, m) * Pm1 - Cslm(s, n, m) * 1.0 / Cslm(s, n-1, m) * Pm
+            Pm = Pm1
+            Pm1 = Pn
          
       
-	return Pn
+        return Pn
 
 
 
@@ -76,22 +76,22 @@ def sYlm(ss, ll, mm, theta, phi):
     s = ss
 
     if (l < 0):
-	return 0
+        return 0
     if (abs(m) > l or l < abs(s)):
-	return 0
+        return 0
 
     if (abs(mm) < abs(ss)):
-	s=mm
-	m=ss
-	if ((m+s) % 2):
-	    Pm  = -Pm
+        s=mm
+        m=ss
+        if ((m+s) % 2):
+            Pm  = -Pm
 
    
     if (m < 0):
-	s=-s
-	m=-m
-	if ((m+s) % 2):
-	    Pm  = -Pm
+        s=-s
+        m=-m
+        if ((m+s) % 2):
+            Pm  = -Pm
 
     result = Pm * s_lambda_lm(s, l, m, cos(theta))
 
