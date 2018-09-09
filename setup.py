@@ -33,11 +33,11 @@ extensions = [
 
 setup(
         name            = 'NRSur7dq2',
-        version         = '1.0.3',
+        version         = '1.0.4',
         description     = short_desc,
         long_description = long_desc,
         author          = 'Jonathan Blackman',
-        author_email    = 'jblackman@tapir.caltech.edu',
+        author_email    = 'jonathan.blackman.0@gmail.com',
         url             = 'https://www.black-holes.org/surrogates/',
         packages        = ['NRSur7dq2'],
         package_data    = {'NRSur7dq2': ['NRSur7dq2.h5']},
