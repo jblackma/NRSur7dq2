@@ -33,7 +33,7 @@ extensions = [
 
 setup(
         name            = 'NRSur7dq2',
-        version         = '1.0.5',
+        version         = '1.0.6',
         description     = short_desc,
         long_description = long_desc,
         author          = 'Jonathan Blackman',
