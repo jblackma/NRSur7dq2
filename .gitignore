@@ -1,2 +1,8 @@
 *.pyc
+*.swp
+*.h5
+*.so
+*.egg-info
+/build
+/dist
 MANIFEST
