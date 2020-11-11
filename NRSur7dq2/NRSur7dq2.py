@@ -9,7 +9,7 @@ published in Blackman et al. 2017 PRD.
 __copyright__ = "Copyright (C) 2017 Jonathan Blackman"
 __email__     = "jonathan.blackman.0@gmail.com"
 __author__    = "Jonathan Blackman"
-__version__   = "1.0.5"
+__version__   = "1.0.6"
 __license__ = """
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
